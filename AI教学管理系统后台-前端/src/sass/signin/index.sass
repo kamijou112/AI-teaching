@@ -1,0 +1,60 @@
+
+.signIn
+  display: flex
+  justify-content: center
+  align-items: center
+  width: 100%
+  height: 100vh
+
+  .signIn-box
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    width: 500px
+    height: 400px
+    background: #fff
+    border-radius: 10px
+    box-shadow: 0 0 10px rgba(0,0,0,0.1)
+
+    .signIn-box-title
+      height: 70px
+      line-height: 70px
+      font-size: 20px
+      font-weight: 600
+      color: #4083E0
+
+    .signIn-box-form
+      flex-grow: 1
+      width: 65%
+      height: 100px
+
+      :deep(.el-tabs__nav)
+        width: 100%
+
+        .el-tabs__active-bar
+          width: 50%
+
+        .el-tabs__item
+          width: 50%
+
+      :deep(.el-tabs__content)
+        display: flex
+        flex-direction: column
+        align-items: center
+        width: 100%
+        height: 60%
+
+        .el-tab-pane
+          margin-top: 20px
+          width: 80%
+
+          .signIn-form
+            width: 100%
+
+            .el-form
+              .el-form-item
+                margin-bottom: 30px
+                &:last-child
+                  .el-form-item__content
+                    justify-content: center

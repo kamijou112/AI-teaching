@@ -1,0 +1,84 @@
+# Spring Boot 后端忽略规则
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package directories
+/target/
+/build/
+/out-artifacts/
+
+# IDEs and editors
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Other
+.project
+.run/
+
+# Vue.js 前端忽略规则
+
+# Dependency directories
+/node_modules/
+
+# Build directories
+/dist/
+/build/
+/public/
+
+# Compiled files
+*.log
+*.lock
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Other hidden files
+.*.swp
+.*.swo
+.*.swn
+.*.bak
+.*.tmp
+*.sublime-*
+*.local
+*.stackdump
+
+# Operating System files #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Dependency lock files
+package-lock.json
+yarn.lock
+
+# Runtime data
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Project files from other languages
+*.pyc
+*.pyo
+*.rbc
+
+# Other (to be adjusted according to your project)
+# ...
