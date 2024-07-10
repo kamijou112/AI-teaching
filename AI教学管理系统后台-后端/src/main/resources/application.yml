@@ -37,7 +37,12 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 server:
   port: 9327
-
+xfyun:
+  api:
+    key: b7c44ecfd5a60cc1de69ac7c996e8c25
+    secret: YmQxNmQyOTA1MDU4YjIxODA1NmUzZDYx
+  app:
+    id: 67a0339c
 
 
 

@@ -116,6 +116,18 @@ public class StudentController {
 
 
     /**
+     * 获取学生信息接口
+     * @param username
+     * @return
+     */
+    @GetMapping("/student/getSingleInfo")
+    @Operation(method = "GET",summary = "获取单个学生信息接口")
+    public R getSingleInfo(String username){
+        String studyresult = studentMapper.selectByUsername(username);
+        return R.ok("获取单个学生信息成功",studyresult);
+    }
+
+    /**
      * 学生信息修改接口
      * @param updateStudent
      * @return
