@@ -3,17 +3,13 @@ import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router
 // Function to check if the user is signed in
 const isSignIn = () => !!localStorage.getItem('isSignIn');
 
-
 import signIn from '@/views/signIn.vue';
-
 import Layout from '@/layouts/Layout.vue';
 import LoginLayout from '@/layouts/LoginLayout.vue';
-
 import teacher from "@/router/teacher.js";
 import student from "@/router/student.js";
-
 import { useAside } from "@/store/aside.js";
-
+import AIAssistant from '@/components/assistant/AIAssistant.vue'; // 导入AI助手组件
 
 const routes = [
     {
@@ -33,6 +29,11 @@ const routes = [
                 children: [
                     ...student
                 ]
+            },
+            {
+                path: 'ai-assistant',
+                name: 'AIAssistant',
+                component: AIAssistant
             }
         ],
         beforeEnter: (to, from, next) => {
@@ -62,8 +63,6 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes
 });
-
-
 
 router.beforeEach((to, from, next) => {
     const userSignedIn = isSignIn();

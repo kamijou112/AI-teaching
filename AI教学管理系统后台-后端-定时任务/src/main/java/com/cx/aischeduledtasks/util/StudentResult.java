@@ -47,37 +47,54 @@ public class StudentResult {
     // 添加定时任务
     @Scheduled(cron = "*/2 * * * * *")
     public void doTask() throws IOException {
-        Student student = studentService.getStudent();
-        if (student == null) {
+        Integer studentId = TaskUtil.getLastStudentId();
+        if (studentId == null) {
             System.out.println("没有匹配的任务~");
             return;
         }
+
+        // 使用后清空 studentId
+        TaskUtil.clearLastStudentId();
+
+        Student student = studentMapper.selectById(studentId);
+        if (student == null) {
+            System.out.println("没有找到对应的学生~");
+            return;
+        }
+
         QueryWrapper<TaskLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", 3);
         queryWrapper.eq("studentid", student.getId());
         List<TaskLog> taskLogs = taskLogMapper.selectList(queryWrapper);
-        if (taskLogs == null) {
+        if (taskLogs == null || taskLogs.isEmpty()) {
             System.out.println("该学生没有任务~");
             return;
         }
+
         List<TopicDetails> list = new ArrayList<>();
         for (TaskLog taskLog : taskLogs) {
             QueryWrapper<TopicDetails> queryWrapper1 = new QueryWrapper<>();
-            queryWrapper.eq("tasklogid", taskLog.getId());
-            queryWrapper.eq("isdui", 2);
+            queryWrapper1.eq("tasklogid", taskLog.getId());
+            queryWrapper1.eq("isdui", 2);
+            queryWrapper1.orderByDesc("createtime"); // 按创建时间倒序排列
+            queryWrapper1.last("LIMIT 10"); // 限制最多取10条记录
             List<TopicDetails> topicDetails = topicDetailsMapper.selectList(queryWrapper1);
-            if (topicDetails == null) {
+            if (topicDetails == null || topicDetails.isEmpty()) {
                 continue;
             }
-            for (TopicDetails topicDetail : topicDetails) {
-                list.add(topicDetail);
-            }
+            list.addAll(topicDetails);
         }
-        String aijiexi = null;
-        for (int i = 0; i < 10; i++) {
-            TopicDetails topicDetails = list.get(i);
+
+        if (list.isEmpty()) {
+            System.out.println("没有找到该学生的错题解析~");
+            return;
+        }
+
+        String aijiexi = "";
+        for (TopicDetails topicDetails : list) {
             aijiexi += topicDetails.getAijiexi() + ",";
         }
+
 
 
         AiJosn myJsonObject = new AiJosn();
@@ -92,7 +109,11 @@ public class StudentResult {
 
         Message userMessage = new Message();
         userMessage.setRole("user");
-        userMessage.setContent("以下是学生最近10道错题，请你分析学生最近学习成果。" + aijiexi);
+        userMessage.setContent("以下是学生最近10道错题的解析，请你分析学生最近学习成果。" + aijiexi+
+                "你需要按照下面这种格式回复我:【易错知识点】[此处是从解析提取的易错知识点，然后换行]"+
+                "【错误类型分析】[此处区分学生的错误类型，例如概念性错误、计算错误、粗心大意、审题不清等，了解错误的根本原因，然后换行]"+
+                "【重复错误点】[此处判断学生是否在同一类型的题目上反复出错，评估他们是否对某些知识点存在持续的理解障碍，如果没有则为“你没有重复的错误知识点”。]"+
+                "【反思与改进】[此处填写对错题的反思与纠正，然后换行]");
         messages.add(userMessage);
         System.out.println(userMessage);
         myJsonObject.setMessages(messages);
@@ -101,23 +122,22 @@ public class StudentResult {
         String json = objectMapper.writeValueAsString(myJsonObject);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS) // 设置连接超时时间
-                .readTimeout(30, TimeUnit.SECONDS) // 设置读取超时时间
-                .writeTimeout(30, TimeUnit.SECONDS) // 设置写入超时时间
+                .connectTimeout(60, TimeUnit.SECONDS) // 设置连接超时时间
+                .readTimeout(60, TimeUnit.SECONDS) // 设置读取超时时间
+                .writeTimeout(60, TimeUnit.SECONDS) // 设置写入超时时间
                 .build();
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, json);
         Request request = new Request.Builder()
                 .url("https://spark-api-open.xf-yun.com/v1/chat/completions")
                 .method("POST", body)
-                .addHeader("Authorization", "Bearer 786a5dced09ec88faee20ad1967c5c6f:NzU4NDgwOWIxZjEwZjg2ZThjMGMxZjRj")
+                .addHeader("Authorization", "Bearer 7399fbfee518a47fa4b19987fe0c4f6b:MWVkM2MwMjliMzE5MmY4M2EzM2YxZGY2")
                 .addHeader("Content-Type", "application/json")
                 .build();
         Response response = client.newCall(request).execute();
         String responseData = response.body().string();
 
         System.out.println(responseData);
-
 
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(responseData, JsonObject.class);

@@ -3,7 +3,7 @@
     <!-- 侧边栏内容 -->
     <aside class="sidebar">
       <el-col>
-        <h5 class="mb-2  b-b-solid  b-b-light">管理系统</h5>
+        <h5 class="mb-2 b-b-solid b-b-light">管理系统</h5>
         <el-menu default-active="0" class="el-menu-vertical-demo">
           <div v-for="(item, index) in asideStore.asideData" :key="index">
             <template v-if="item.children.length === 0">
@@ -16,13 +16,17 @@
                 <template #title>
                   <div>{{ item.title }}</div>
                 </template>
-                <el-menu-item v-for="(child, I) in item.children" :index="String(index - I)" :key="I"
+                <el-menu-item v-for="(child, I) in item.children" :index="`${index}-${I}`" :key="I"
                   @click="pageJump(child)">
                   <span>{{ child.title }}</span>
                 </el-menu-item>
               </el-sub-menu>
             </template>
           </div>
+          <!-- 添加AI助手菜单项 -->
+          <el-menu-item index="ai-assistant" @click="navigateToAIAssistant">
+            <span>AI助手</span>
+          </el-menu-item>
         </el-menu>
       </el-col>
     </aside>
@@ -64,7 +68,6 @@
       </div>
     </main>
   </div>
-
 
   <!-- 修改学生信息 -->
   <el-dialog v-model="updateStudentInfoPopup" title="修改账号信息" width="500">
@@ -113,9 +116,14 @@
   </el-dialog>
 </template>
 
-
 <script setup>
-import useUpdateStudentInfo from "@/composables/useUpdateStudentInfo"
+import useUpdateStudentInfo from "@/composables/useUpdateStudentInfo";
+import useUpdateTeacherInfo from "@/composables/useUpdateTeacherInfo";
+import { useAside } from "@/store/aside.js";
+import { useHistory } from "@/store/history.js";
+import { onMounted, reactive } from "vue";
+import { useRouter } from "vue-router"; // 确保从vue-router中导入
+import AIAssistant from '@/components/assistant/AIAssistant.vue'; // 导入AI助手组件
 
 const {
   updateStudentInfoForm,
@@ -142,83 +150,98 @@ const router = useRouter();
 const infoData = reactive({
   identity: "",
   name: ""
-})
-
+});
 
 // 设置信息
 const setInfo = () => {
   const info = JSON.parse(localStorage.getItem("user"));
-  info.identity === 'isTeacher' ? infoData.identity = "教" : infoData.identity = "学"
+  info.identity === 'isTeacher' ? infoData.identity = "教" : infoData.identity = "学";
 
   if (info.identity === 'isTeacher') {
     router.push({
       name: 'myStudents'
-    })
+    });
     historyStore.setHistory({
       name: "myStudents",
       title: "我的学生",
       isActivated: true
-    })
+    });
     initUpdateTeacherInfoForm();
   } else {
     router.push({
       name: 'studentCourse1'
-    })
+    });
     historyStore.setHistory({
       name: "studentCourse1",
       title: "我的课程",
       isActivated: true
-    })
+    });
     initUpdateStudentInfoForm();
   }
 
-  infoData.name = info.data.name
-}
+  infoData.name = info.data.name;
+};
 
 // 页面跳转
 const pageJump = (item) => {
   router.push({
     name: item.name
-  })
+  });
   historyStore.setHistory({
     name: item.name,
     title: item.title,
     isActivated: true
-  })
-}
+  });
+};
 
 // 点击历史记录
 const changeHistory = (history) => {
-  historyStore.setHistory(history)
+  historyStore.setHistory(history);
   router.push({
     name: history.name
-  })
-}
+  });
+};
 
 // 删除历史记录
 const deleteHistory = (index) => {
-  if (historyStore.history.length == 1) return
-  historyStore.deleteHistory(index)
+  if (historyStore.history.length == 1) return;
+  historyStore.deleteHistory(index);
   router.push({
     name: historyStore.history[historyStore.history.length - 1].name
-  })
-}
+  });
+};
 
 // 退出登录
 const exitLogin = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("isSignIn");
-  router.go(0)
-}
+  router.go(0);
+};
 
+// 导航到AI助手页面
+const navigateToAIAssistant = () => {
+  router.push({ name: 'AIAssistant' });
+  historyStore.setHistory({
+    name: "AIAssistant",
+    title: "AI助手",
+    isActivated: true
+  });
+};
 
-
+// 导航到学习资源推荐页面
+const navigateToStudyResources = () => {
+  router.push({ name: 'StudyResources' });
+  historyStore.setHistory({
+    name: "StudyResources",
+    title: "学习资源推荐",
+    isActivated: true
+  });
+};
 
 onMounted(() => {
   setInfo();
-})
+});
 </script>
-
 
 <style scoped lang="scss">
 .layout {
@@ -258,7 +281,6 @@ onMounted(() => {
         &:hover {
           span {
             border-radius: 5px;
-
           }
         }
 
@@ -286,11 +308,9 @@ onMounted(() => {
     }
 
     .el-sub-menu {
-
       .el-sub-menu__title {
         justify-content: center;
       }
-
     }
 
     // 二级菜单
@@ -365,7 +385,6 @@ onMounted(() => {
           margin-top: 2px;
         }
 
-
         &:hover {
           background-color: #EEEEEE;
         }
@@ -421,14 +440,12 @@ onMounted(() => {
         justify-items: center;
         align-items: center;
         top: 50px;
-        ;
         padding: 5px;
         width: 100%;
         box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.1);
         border-radius: 5px;
         background: #ffffff;
         transition: all 0.5s;
-
 
         .administrator-hover-text {
           box-sizing: border-box;
@@ -457,7 +474,7 @@ onMounted(() => {
 
 .but {
   :deep(.el-form-item__content) {
-    justify-content: center
+    justify-content: center;
   }
 }
 </style>

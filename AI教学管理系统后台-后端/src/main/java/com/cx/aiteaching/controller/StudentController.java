@@ -116,15 +116,18 @@ public class StudentController {
 
 
     /**
-     * 获取学生信息接口
+     * 获取学生学习成果接口
      * @param username
      * @return
      */
-    @GetMapping("/student/getSingleInfo")
-    @Operation(method = "GET",summary = "获取单个学生信息接口")
-    public R getSingleInfo(String username){
-        String studyresult = studentMapper.selectByUsername(username);
-        return R.ok("获取单个学生信息成功",studyresult);
+    @GetMapping("/student/getStudyResults")
+    @Operation(method = "GET", summary = "获取学生学习成果接口")
+    public R getStudyResults(@RequestParam String username) {
+        String studyResults = studentMapper.getStudyResultByUsername(username);
+        if (studyResults == null) {
+            return R.fail("学生不存在或没有学习成果");
+        }
+        return R.ok("获取学习成果成功", studyResults);
     }
 
     /**

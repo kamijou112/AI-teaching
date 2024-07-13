@@ -2,20 +2,40 @@
 import topicApi from '@/api/topicApi';
 import useTime from '@/composables/useTime';
 import { id } from 'element-plus/es/locales.mjs';
-import { watch } from 'vue';
+import { watch, ref, reactive, defineExpose } from 'vue';
+
+const generateAIQuestions = async (requirements) => {
+    try {
+        const response = await fetch('http://localhost:9327/api/ai/generateQuestions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ requirements }),
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to generate AI questions:', error);
+        return [];
+    }
+};
 
 const kcId = ref();
 const search = ref();
-const topicList = ref();
-const addTopicPopUps = ref();
-const editTopicPopUps = ref(false)
+const topicList = ref([]);
+const addTopicPopUps = ref(false);
+const aiPopUps = ref(false);
+const editTopicPopUps = ref(false);
 const topicForm = reactive({
     taskid: "",
     type: "",
     tigan: "",
     xuanxiang: "",
     daan: ""
-})
+});
 const editTopicForm = reactive({
     taskid: "",
     type: "",
@@ -23,56 +43,36 @@ const editTopicForm = reactive({
     xuanxiang: "",
     daan: "",
     id
-})
+});
 
+const aiRequirement = ref('');
+const chatMessages = ref([
+    { type: 'assistant', text: '我是一个出题助手，请输入你想生成题目的需求，例如题目类型和难度。' }
+]);
 
 const props = defineProps({
     courseTaskDetailsId: {
         type: String,
         required: true
     },
-
-})
+});
 
 const numberToLetter = {
     1: 'A',
     2: 'B',
     3: 'C',
     4: 'D',
-    5: 'E',
-    6: 'F',
-    7: 'G',
-    8: 'H',
-    9: 'I',
-    10: 'J',
-    11: 'K',
-    12: 'L',
-    13: 'M',
-    14: 'N',
-    15: 'O',
-    16: 'P',
-    17: 'Q',
-    18: 'R',
-    19: 'S',
-    20: 'T',
-    21: 'U',
-    22: 'V',
-    23: 'W',
-    24: 'X'
 };
 
-// 函数：将数字转换为字母
 const convertNumberToLetter = (number) => {
     return numberToLetter[number];
 };
 
-// 获取课程题目
 const getTopic = async (id) => {
-    const { data } = await topicApi.getTopicDetile(id)
-    topicList.value = data.data
+    const { data } = await topicApi.getTopicDetile(id);
+    topicList.value = data.data;
 }
 
-// 搜索题目
 const searchCourse = () => {
     if (search.value === '') {
         ElMessage({
@@ -80,7 +80,7 @@ const searchCourse = () => {
             type: 'warning',
         })
     } else {
-        topicList.value = topicList.value.filter(item => item.tigan.includes(search.value))
+        topicList.value = topicList.value.filter(item => item.tigan.includes(search.value));
         ElMessage({
             message: '搜索成功',
             type: 'success',
@@ -88,7 +88,6 @@ const searchCourse = () => {
     }
 }
 
-// 删除题目
 const deleteTopic = async (id) => {
     try {
         await ElMessageBox.confirm(`确定要删除该题目吗?`, "提示", {
@@ -115,7 +114,6 @@ const deleteTopic = async (id) => {
     }
 }
 
-// 添加题目
 const addTopic = async () => {
     if (topicForm.tigan === '') {
         ElMessage({
@@ -133,7 +131,7 @@ const addTopic = async () => {
         return
     }
 
-    topicForm.taskid = kcId.value
+    topicForm.taskid = kcId.value;
     try {
         await topicApi.AddTopic(topicForm);
         ElMessage({
@@ -145,7 +143,7 @@ const addTopic = async () => {
         topicForm.tigan = "";
         topicForm.xuanxiang = "";
         topicForm.daan = "";
-        addTopicPopUps.value = false
+        addTopicPopUps.value = false;
 
     } catch (e) {
         ElMessage({
@@ -155,20 +153,50 @@ const addTopic = async () => {
     }
 }
 
+// AI 生成题目并添加
+const addAIQuestions = async () => {
+    try {
+        const requirements = aiRequirement.value; // 获取用户输入的AI需求
+        const generatedQuestions = await generateAIQuestions(requirements);
+        for (const question of generatedQuestions) {
+            question.taskid = kcId.value;
+            await topicApi.AddTopic(question);
+        }
+        chatMessages.value.push({ type: 'assistant', text: '创建题目成功，还有需要请输入新的出题需求需求。' });
+        ElMessage({
+            message: 'AI 生成题目并添加成功',
+            type: 'success',
+        });
+        await getTopic(kcId.value);
+    } catch (e) {
+        chatMessages.value.push({ type: 'assistant', text: '生成失败，请重试。' });
+        ElMessage({
+            message: 'AI 生成题目失败',
+            type: 'error',
+        });
+    }
+}
+
+const sendMessage = () => {
+    if (aiRequirement.value.trim() !== '') {
+        chatMessages.value.push({ type: 'user', text: aiRequirement.value });
+        addAIQuestions();
+        aiRequirement.value = '';
+    }
+}
+
 const resetData = () => topicList.value = [];
 
-// 编辑课程弹窗
 const editTopic = ({ taskid, type, tigan, xuanxiang, daan, id }) => {
-    editTopicForm.taskid = taskid
-    editTopicForm.type = type
-    editTopicForm.tigan = tigan
-    editTopicForm.xuanxiang = xuanxiang
-    editTopicForm.daan = daan
-    editTopicForm.id = id
+    editTopicForm.taskid = taskid;
+    editTopicForm.type = type;
+    editTopicForm.tigan = tigan;
+    editTopicForm.xuanxiang = xuanxiang;
+    editTopicForm.daan = daan;
+    editTopicForm.id = id;
     editTopicPopUps.value = true;
 }
 
-// 保存
 const preservation = async () => {
     try {
         await topicApi.UpdateTopic(editTopicForm);
@@ -177,7 +205,7 @@ const preservation = async () => {
             type: 'success',
         })
         await getTopic(kcId.value);
-        editTopicPopUps.value = false
+        editTopicPopUps.value = false;
     } catch (e) {
         console.log(e);
         ElMessage({
@@ -187,9 +215,16 @@ const preservation = async () => {
     }
 }
 
-
 watch(() => props.courseTaskDetailsId, (newVal, oldVal) => {
-    kcId.value = newVal
+    kcId.value = newVal;
+});
+
+watch(aiPopUps, (newVal, oldVal) => {
+    if (!newVal) {
+        chatMessages.value = [
+            { type: 'assistant', text: '我是一个出题助手，请输入你想生成题目的需求，例如题目类型和数量。' }
+        ];
+    }
 });
 
 defineExpose({
@@ -230,9 +265,18 @@ defineExpose({
                     创建题目
                 </el-button>
             </el-col>
+            <!-- AI 生成题目 -->
+            <el-col :span="1.5">
+                <el-button type="primary" class="m-l-10px" @click="aiPopUps = true">
+                    <el-icon class="m-r-5px" size="16">
+                        <Cpu />
+                    </el-icon>
+                    AI出题
+                </el-button>
+            </el-col>
         </el-row>
         <!-- 表单 -->
-        <el-table :data="topicList" border style="width: 100%">
+        <el-table :data="topicList" border style="width: 100%;">
             <!-- 创建时间 -->
             <el-table-column prop="createtime" label="创建时间" max-width="180">
                 <template #default="scope">
@@ -265,7 +309,7 @@ defineExpose({
                     <!-- 填空题 -->
                     <template v-if="scope.row.type === 1">
                         <el-popover placement="top-start" title="答案详情" :width="200" trigger="hover"
-                            :content="scope.row.tigan">
+                            :content="scope.row.daan">
                             <template #reference>
                                 <div class="w-90% overflow-hidden text-ellipsis whitespace-nowrap">{{ scope.row.daan }}
                                 </div>
@@ -293,7 +337,6 @@ defineExpose({
             </el-table-column>
         </el-table>
     </div>
-
 
     <!-- 添加课程弹窗 -->
     <el-dialog v-model="addTopicPopUps" title="添加题目" width="500">
@@ -346,8 +389,25 @@ defineExpose({
         </template>
     </el-dialog>
 
+    <!-- AI 需求弹窗 -->
+    <el-dialog v-model="aiPopUps" title="AI 出题小助手" width="600" :style="{top: '10vh'}">
+        <el-form>
+            <div class="chat-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
+                <div v-for="message in chatMessages" :key="message.text" class="chat-message">
+                    <div :class="{'user-message': message.type === 'user', 'assistant-message': message.type === 'assistant'}">
+                        {{ message.text }}
+                    </div>
+                </div>
+            </div>
+        </el-form>
+        <div class="input-container" style="display: flex; margin-top: 10px;">
+            <el-input v-model="aiRequirement" placeholder="请输入生成题目的需求，例如题目类型和数量" @keyup.enter="sendMessage" style="flex: 1; margin-right: 10px;" />
+            <el-button type="primary" @click="sendMessage">发送</el-button>
+        </div>
+    </el-dialog>
+
     <!-- 编辑课程弹窗 edit -->
-    <el-dialog v-model="editTopicPopUps" title="添加题目" width="500">
+    <el-dialog v-model="editTopicPopUps" title="编辑题目" width="500">
         <el-form :model="editTopicForm">
             <el-form-item label="请输入题目名称" label-width="140px">
                 <el-input v-model="editTopicForm.tigan" autocomplete="off" />
@@ -396,10 +456,26 @@ defineExpose({
             </div>
         </template>
     </el-dialog>
-
 </template>
 
-<style scoped lang="sass">
-.topic::-webkit-scrollbar
-    display: none
+<style scoped>
+.topic::-webkit-scrollbar {
+    display: none;
+}
+
+.user-message {
+    text-align: right;
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 10px;
+    margin: 5px 0;
+}
+
+.assistant-message {
+    text-align: left;
+    background-color: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 10px;
+    margin: 5px 0;
+}
 </style>

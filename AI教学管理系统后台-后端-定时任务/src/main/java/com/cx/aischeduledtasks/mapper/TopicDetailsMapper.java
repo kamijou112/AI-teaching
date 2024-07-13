@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface TopicDetailsMapper extends BaseMapper<TopicDetails> {
 
-    @Select("SELECT a.*,b.tigan,b.type,b.xuanxiang,b.daan FROM `ai_taskdolog` AS a LEFT JOIN  ai_timu as b ON a.timuid = b.id WHERE b.taskid = 1")
+    @Select("SELECT a.*,b.tigan,b.type,b.xuanxiang,b.daan FROM `ai_taskdolog` AS a LEFT JOIN  ai_timu as b ON a.timuid = b.id WHERE b.taskid = #{taskid}")
     List<TopicDetailsVo> topicDetatail(Integer taskid);
 
 }

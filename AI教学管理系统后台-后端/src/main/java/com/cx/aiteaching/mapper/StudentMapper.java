@@ -18,5 +18,5 @@ public interface StudentMapper extends BaseMapper<Student> {
 
 
     @Select(" SELECT studyresult FROM ai_students WHERE  username = #{usernmae} ")
-    String selectByUsername(String username);
+    String getStudyResultByUsername(String username);
 }

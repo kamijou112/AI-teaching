@@ -47,6 +47,9 @@ public class TaskUtil {
     @Resource
     private CourseTasksMapper courseTasksMapper;
 
+    private static Integer lastStudentId = null; // 用于保存上次更新的 studentId
+
+
 
     // 添加定时任务
     @Scheduled(cron = "*/2 * * * * *")
@@ -85,10 +88,22 @@ public class TaskUtil {
         }
         log.setStatus(3);
         taskLogMapper.updateById(log);
+
+        // 保存 studentId
+        lastStudentId = log.getStudentid();
+
         CourseTasks courseTasks = courseTasksMapper.selectById(log.getTaskid());
         courseTasks.setWanchengsounts(courseTasks.getWanchengsounts() + 1);
         courseTasksMapper.updateById(courseTasks);
         System.out.println("定时任务了一次~");
+    }
+
+    public static Integer getLastStudentId() {
+        return lastStudentId;
+    }
+
+    public static void clearLastStudentId() {
+        lastStudentId = null;
     }
 
 

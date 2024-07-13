@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.cx</groupId>
     <artifactId>ai-scheduled-tasks</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>ai-scheduled-tasks</name>
     <description>ai-scheduled-tasks</description>
     <properties>
