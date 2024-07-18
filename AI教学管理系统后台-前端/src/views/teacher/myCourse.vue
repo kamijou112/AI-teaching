@@ -241,28 +241,23 @@ onMounted(getCourse);
 
 <template>
   <div class="myStudents">
-    <el-row class="box-border p-20px m-b-30px bg-#fff ">
+    <el-row class="box-border p-20px m-b-30px bg-#fff flex-row">
       <!-- 搜索 -->
-      <el-col :span="6" class="flex">
-        <el-input v-model="search" placeholder="请输入课程名称" />
+      <el-col :span="24" class="flex-row">
+        <el-input v-model="search" placeholder="请输入课程名称" class="search-input" />
         <el-button type="primary" class="m-l-10px" @click="searchCourse">
           <el-icon class="m-r-5px" size="16">
             <Search />
           </el-icon>
           查询课程
         </el-button>
-      </el-col>
-      <!-- 重置 -->
-      <el-col :span="1.5" class="flex">
         <el-button type="primary" class="m-l-10px" @click="getCourse">
           <el-icon class="m-r-5px" size="16">
             <Refresh />
           </el-icon>
           重置
         </el-button>
-      </el-col>
       <!-- 创建课程 -->
-      <el-col :span="6">
         <el-button type="primary" class="m-l-10px" @click="addCoursePopUps = true">
           <el-icon class="m-r-5px" size="16">
             <Plus />
@@ -270,7 +265,6 @@ onMounted(getCourse);
           创建课程
         </el-button>
       </el-col>
-
     </el-row>
     <!-- 表单 -->
     <el-row class="form box-border overflow-scroll justify-end p-20px  max-h-70vh bg-#fff">
@@ -410,6 +404,14 @@ onMounted(getCourse);
 .form::-webkit-scrollbar
   display: none
 
+
+.flex-row
+  display: flex
+  align-items: center
+  gap: 10px
+
+.search-input
+  width: 300px
 
 :deep(.el-row)
   border-radius: 10px

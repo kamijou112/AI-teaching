@@ -3,6 +3,7 @@ import studentCourse1 from "../views/student/studentCourse1.vue"
 import courseDetails from "../views/student/courseDetails.vue"
 import task from "../views/student/task.vue"
 import StudyResources from "../views/student/StudyResources.vue" // 添加这一行导入StudyResources组件
+import MistakeBook from "../views/student/MistakeBook.vue"
 
 // 学生路由
 const student = [
@@ -41,6 +42,15 @@ const student = [
             aside: true // 确保该项在侧边栏显示
         },
         component: StudyResources,
+    },
+    {
+        path: 'student/mistake-book',
+        name: 'MistakeBook',
+        meta: {
+        title: '错题本',
+        aside: true // 确保该项目在侧边栏显示
+        },
+        component: MistakeBook,
     }
 ]
 

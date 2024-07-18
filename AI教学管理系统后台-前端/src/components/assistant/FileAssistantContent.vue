@@ -1,12 +1,28 @@
 <template>
   <div class="chat-interface">
     <div class="chat-area" ref="chatArea">
+      <div v-if="newConversation && messages.length === 1" class="pre-inputs-overlay">
+        <div class="pre-inputs">
+          <div class="pre-inputs-header">
+            <p class="pre-inputs-title">智能图助手</p>
+            <p class="pre-inputs-description">
+              嗨~我是图片识别助手，上传图片，可针对图片对我进行提问！
+            </p>
+            <p class="pre-inputs-description">
+              <strong>上传附件：</strong>点击输入框左侧的附件图标即可选择上传图片；
+            </p>
+            <p class="pre-inputs-description">
+              <strong>助手切换：</strong>一键切换，多个助手帮助你解决多种问题；
+            </p>
+          </div>
+        </div>
+      </div>
       <div v-for="(message, index) in messages" :key="index" :class="['message', message.sender]">
         <img v-if="message.sender === 'assistant'" src="../../assets/bot-icon2.png" class="icon" alt="Assistant Icon" />
         <div class="message-content">
           <span v-if="message.files && message.files.length" class="message-files">
             <div v-for="(file, index) in message.files" :key="index" class="message-file">
-              <img src="../../assets/file-icon2.png" alt="File Icon" class="file-icon" />
+              <img src="../../assets/file-icon.png" alt="File Icon" class="file-icon" />
               <span class="file-name">{{ file.name }}</span>
             </div>
           </span>
@@ -63,10 +79,11 @@ export default {
     return {
       userInput: '',
       messages: [
-        { text: '你好！我是图片助手，有什么我可以帮你的吗？', sender: 'assistant' }
+        { text: '您好！我是图片助手，有什么我可以帮你的吗？', sender: 'assistant' }
       ],
       loading: false,
-      selectedFiles: []
+      selectedFiles: [],
+      newConversation: true
     };
   },
   methods: {
@@ -84,6 +101,7 @@ export default {
       this.messages.push(userMessage);
       this.userInput = '';
       this.selectedFiles = [];
+      this.newConversation = false;
 
       const assistantLoadingMessage = {
         text: '',
@@ -150,6 +168,7 @@ export default {
       this.messages = [
         { text: '你好！我是图片助手，有什么我可以帮你的吗？', sender: 'assistant' }
       ];
+      this.newConversation = true;
     }
   },
   mounted() {
@@ -177,6 +196,42 @@ export default {
   padding: 20px;
   overflow-y: auto;
   max-height: calc(100vh - 140px);
+  position: relative;
+}
+
+.pre-inputs-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 10;
+}
+
+.pre-inputs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.pre-inputs-header {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.pre-inputs-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #3c7bff;
+  margin-bottom: 10px;
+}
+
+.pre-inputs-description {
+  font-size: 16px;
+  color: #000;
 }
 
 .message {
@@ -263,6 +318,7 @@ export default {
   align-items: center;
   padding: 10px 20px;
   margin-bottom: 50px;
+  width: 100%;
 }
 
 .file-preview-container {
@@ -280,10 +336,6 @@ export default {
   position: relative;
 }
 
-.dialogue-box input[type="file"] {
-  display: none;
-}
-
 .input-wrapper {
   position: relative;
   display: flex;
@@ -295,9 +347,9 @@ export default {
   width: 24px;
   height: 24px;
   margin-right: 10px;
-  cursor: pointer;
   position: absolute;
-  left: 10px;
+  left: 40px;
+  cursor: pointer;
 }
 
 .dialogue-box input {
@@ -306,30 +358,8 @@ export default {
   border: 1px solid #d3d3d3;
   border-radius: 30px;
   font-size: 16px;
-  padding-left: 40px; /* 为SVG图标预留空间 */
-  padding-right: 40px; /* 为按钮预留空间 */
-}
-
-.file-preview {
-  display: flex;
-  align-items: center;
-  background-color: #f3f3f3;
-  padding: 5px 10px;
-  border-radius: 30px;
-  margin-bottom: 5px;
-  position: relative;
-}
-
-.remove-file-button {
-  background: none;
-  border: none;
-  color: #ff0000;
-  font-size: 16px;
-  cursor: pointer;
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 5px;
+  padding-left: 70px;
+  padding-right: 40px;
 }
 
 .dialogue-box button {
@@ -358,3 +388,4 @@ export default {
   cursor: not-allowed;
 }
 </style>
+

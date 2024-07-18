@@ -63,7 +63,7 @@ public class TeacherController {
             Map<String,Object> map = new HashMap<>();
             map.put("data",teacher);
             map.put("identity","isTeacher");
-           return R.ok("登录成功",map);
+            return R.ok("登录成功",map);
         }
         return R.fail("账号或密码错误");
     }

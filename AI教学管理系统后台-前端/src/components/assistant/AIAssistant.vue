@@ -20,8 +20,9 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="AI助手">AI问答助手</el-dropdown-item>
+            <el-dropdown-item command="AI助手">问答助手</el-dropdown-item>
             <el-dropdown-item command="文件助手">图片助手</el-dropdown-item>
+            <el-dropdown-item command="摘要助手">摘要助手</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -33,7 +34,7 @@
             <path d="M15,21H7V20H5V19H4V18H3V17H2V15H1V7H2V5H3V4H4V3H5V2H7V1H15V2H17V3H18V4H19V5H20V7H21V15H20V17H19V18H18V19H17V20H15ZM12,16V12H16V10H12V6H10V10H6V12H10V16Z"></path>
           </g>
         </svg>
-        <div class="tooltip" v-if="tooltipVisible">创建新会话</div>
+        <div class="tooltip" v-if="tooltipVisible || true">创建新会话</div>
       </div>
     </div>
     <div class="main-content">
@@ -51,10 +52,12 @@ const currentAssistant = ref('AI助手');
 
 const AIAssistant = defineAsyncComponent(() => import('./AIAssistantContent.vue'));
 const FileAssistant = defineAsyncComponent(() => import('./FileAssistantContent.vue'));
+const SummaryAssistant = defineAsyncComponent(() => import('./SummaryAssistantContent.vue'));
 
 const assistants = {
   'AI助手': AIAssistant,
-  '文件助手': FileAssistant
+  '文件助手': FileAssistant,
+  '摘要助手': SummaryAssistant
 };
 
 type AssistantComponentInstance = {
@@ -62,7 +65,7 @@ type AssistantComponentInstance = {
 };
 
 const currentAssistantComponent = ref(assistants['AI助手']);
-const currentAssistantRef = ref<InstanceType<typeof AIAssistant | typeof FileAssistant> & AssistantComponentInstance | null>(null);
+const currentAssistantRef = ref<InstanceType<typeof AIAssistant | typeof FileAssistant | typeof SummaryAssistant> & AssistantComponentInstance | null>(null);
 
 const handleCommand = (command: string) => {
   currentAssistant.value = command;
@@ -94,10 +97,10 @@ const newConversation = () => {
 }
 
 .sidebar {
-  width: 140px;
+  width: 200px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   padding-top: 30px;
   position: relative;
@@ -113,7 +116,8 @@ const newConversation = () => {
   color: #000;
   display: flex;
   align-items: center;
-  font-size: 17px;
+  font-size: 22px;
+  margin-left: 40px; /* Add margin to move it to the right */
 }
 
 .icon {
@@ -128,6 +132,7 @@ const newConversation = () => {
   position: relative;
   margin-top: auto;
   margin-bottom: auto;
+  margin-left: 40px; /* Add margin to align with the dropdown */
 }
 
 .new-conversation-icon {

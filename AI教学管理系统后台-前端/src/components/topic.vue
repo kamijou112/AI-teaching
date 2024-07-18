@@ -156,6 +156,7 @@ const addTopic = async () => {
 // AI 生成题目并添加
 const addAIQuestions = async () => {
     try {
+        chatMessages.value.push({ type: 'assistant', text: '请稍等，正在生成题目。' });
         const requirements = aiRequirement.value; // 获取用户输入的AI需求
         const generatedQuestions = await generateAIQuestions(requirements);
         for (const question of generatedQuestions) {
@@ -435,7 +436,7 @@ defineExpose({
                     <el-radio-group v-model="editTopicForm.daan">
                         <el-radio v-for="(item, index) in editTopicForm.xuanxiang.split('|')" :key="index"
                             :label="1 + index">{{ item }}</el-radio>
-                    </el-radio-group>
+                </el-radio-group>
                 </el-form-item>
             </template>
             <!-- 判断 -->

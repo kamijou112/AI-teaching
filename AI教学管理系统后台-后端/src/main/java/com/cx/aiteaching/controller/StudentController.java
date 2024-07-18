@@ -20,10 +20,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.security.Principal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 汪洋
@@ -114,21 +113,6 @@ public class StudentController {
         return R.ok("获取学生信息成功",student);
     }
 
-
-    /**
-     * 获取学生学习成果接口
-     * @param username
-     * @return
-     */
-    @GetMapping("/student/getStudyResults")
-    @Operation(method = "GET", summary = "获取学生学习成果接口")
-    public R getStudyResults(@RequestParam String username) {
-        String studyResults = studentMapper.getStudyResultByUsername(username);
-        if (studyResults == null) {
-            return R.fail("学生不存在或没有学习成果");
-        }
-        return R.ok("获取学习成果成功", studyResults);
-    }
 
     /**
      * 学生信息修改接口
@@ -383,8 +367,19 @@ public class StudentController {
         return R.ok("提交成功");
     }
 
-
-
-
+    /**
+     * 获取学生学习成果接口
+     * @param studentid 学生ID
+     * @return 学生学习成果
+     */
+    @GetMapping("/student/getStudyResult")
+    @Operation(method = "GET", summary = "获取学生学习成果接口")
+    public R getStudyResult(@RequestParam Integer studentid) {
+        String studyResult = studentMapper.getStudyResultById(studentid);
+        if (studyResult == null) {
+            return R.fail("学生不存在或无学习成果");
+        }
+        return R.ok("获取学生学习成果成功", studyResult);
+    }
 
 }

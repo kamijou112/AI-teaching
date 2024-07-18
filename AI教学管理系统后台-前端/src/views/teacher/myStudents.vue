@@ -1,76 +1,73 @@
 <script setup>
-import studentApi from '@/api/studentApi';
-import useTime from '@/composables/useTime';
-import useStudentsResult from "@/composables/useStudentsResult"
-import { MdPreview } from 'md-editor-v3';
-import 'md-editor-v3/lib/style.css';
+  import studentApi from '@/api/studentApi';
+  import useTime from '@/composables/useTime';
+  import useStudentsResult from "@/composables/useStudentsResult"
+  import { MdPreview } from 'md-editor-v3';
+  import 'md-editor-v3/lib/style.css';
 
-const { studentsResultPopup, studentsResultData, openResultPopup } = useStudentsResult();
+  const { studentsResultPopup, studentsResultData, openResultPopup } = useStudentsResult();
 
-const student = ref([]);
-const search = ref('');
-const getStudents = async () => {
-  const { data } = await studentApi.getAllStudent();
-  student.value = data.data;
-};
-const searchStudent = () => {
-  if (search.value === '') {
-    ElMessage({
-      message: '请输入学生名称',
-      type: 'warning',
-    })
-  } else {
-    student.value = student.value.filter(item => item.name.includes(search.value))
-    ElMessage({
-      message: '搜索成功',
-      type: 'success',
-    })
-  }
-}
-
-const edit = async (data) => {
-  const title = data.status === 0 ? '封禁学生' : '解封学生';
-  const status = data.status === 0 ? 1 : 0;
-  try {
-    await ElMessageBox.confirm(`确定要${title}${data.name}吗?`, "提示", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      top: '10vh',
-      type: "warning"
-    })
-    try {
-      await studentApi.updateStudent(data.id, status);
+  const student = ref([]);
+  const search = ref('');
+  const getStudents = async () => {
+    const { data } = await studentApi.getAllStudent();
+    student.value = data.data;
+  };
+  const searchStudent = () => {
+    if (search.value === '') {
       ElMessage({
-        message: '解封成功',
+        message: '请输入学生名称',
+        type: 'warning',
+      })
+    } else {
+      student.value = student.value.filter(item => item.name.includes(search.value))
+      ElMessage({
+        message: '搜索成功',
         type: 'success',
       })
-      await getStudents();
-    } catch (err) {
-      ElMessage('解封失败')
     }
-  } catch (err) {
-    ElMessage('已取消')
   }
-}
 
-onMounted(getStudents);
+  const edit = async (data) => {
+    const title = data.status === 0 ? '封禁学生' : '解封学生';
+    const status = data.status === 0 ? 1 : 0;
+    try {
+      await ElMessageBox.confirm(`确定要${title}${data.name}吗?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        top: '10vh',
+        type: "warning"
+      })
+      try {
+        await studentApi.updateStudent(data.id, status);
+        ElMessage({
+          message: '解封成功',
+          type: 'success',
+        })
+        await getStudents();
+      } catch (err) {
+        ElMessage('解封失败')
+      }
+    } catch (err) {
+      ElMessage('已取消')
+    }
+  }
+
+  onMounted(getStudents);
 </script>
 
 <template>
   <div class="myStudents">
     <!-- 搜索 -->
-    <el-row class="box-border p-20px m-b-30px bg-#fff ">
-      <el-col :span="6" class="flex">
-        <el-input v-model="search" placeholder="请输入学生姓名" />
+    <el-row class="box-border p-20px m-b-30px bg-#fff flex-row">
+      <el-col :span="24" class="flex-row">
+        <el-input v-model="search" placeholder="请输入学生姓名" class="search-input" />
         <el-button type="primary" class="m-l-10px" @click="searchStudent">
           <el-icon class="m-r-5px" size="16">
             <Search />
           </el-icon>
           查询学生
         </el-button>
-      </el-col>
-      <!-- 重置 -->
-      <el-col :span="6" class="flex">
         <el-button type="primary" class="m-l-10px" @click="getStudents">
           <el-icon class="m-r-5px" size="16">
             <Refresh />
@@ -99,7 +96,7 @@ onMounted(getStudents);
           <el-table-column prop="studyresult" label="学生近期学习成果" min-width="180">
             <template #default="empty">
               <el-empty v-if="empty.row.studyresult === null" description="暂无学习成果" :image-size="50"
-                style="width: 160px;height: 80px;" />
+                        style="width: 160px;height: 80px;" />
               <div v-else>
                 <el-tag type="primary" @click="openResultPopup(empty.row.studyresult)">查看学习成果</el-tag>
               </div>
@@ -128,31 +125,38 @@ onMounted(getStudents);
 </template>
 
 <style scoped lang="sass">
-.myStudents
-  box-sizing: border-box
-  padding: 20px
-  width: 100%
-  height: 100%
+  .myStudents
+    box-sizing: border-box
+    padding: 20px
+    width: 100%
+    height: 100%
 
-.form::-webkit-scrollbar
-  display: none
-
-
-:deep(.el-row)
-  border-radius: 10px
+  .form::-webkit-scrollbar
+    display: none
 
 
-:deep(.el-table__cell)
-  .cell
-    color: #000
+  .flex-row
+    display: flex
+    align-items: center
+    gap: 10px
 
-:deep(.el-table__row)
-  .cell
-    color: #767575
+  .search-input
+    width: 300px
 
-:deep(.el-empty__description)
-  margin-top: 0 !important
+  :deep(.el-row)
+    border-radius: 10px
 
-#preview-only
-  max-height: 600px
+  :deep(.el-table__cell)
+    .cell
+      color: #000
+
+  :deep(.el-table__row)
+    .cell
+      color: #767575
+
+  :deep(.el-empty__description)
+    margin-top: 0 !important
+
+  #preview-only
+    max-height: 600px
 </style>

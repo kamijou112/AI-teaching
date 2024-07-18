@@ -24,7 +24,6 @@ public class MybatisPlusConfig {
 
     @Primary
     @Bean
-
     @ConfigurationProperties("mybatis-plus")
     public MybatisPlusProperties mybatisPlusProperties() {
         return new MybatisPlusProperties();

@@ -3,7 +3,10 @@
     <!-- 侧边栏内容 -->
     <aside class="sidebar">
       <el-col>
-        <h5 class="mb-2 b-b-solid b-b-light">管理系统</h5>
+        <div class="logo">
+          <img src="../assets/logo5.png" alt="Logo">
+        </div>
+        <div class="separator"></div>
         <el-menu default-active="0" class="el-menu-vertical-demo">
           <div v-for="(item, index) in asideStore.asideData" :key="index">
             <template v-if="item.children.length === 0">
@@ -259,6 +262,26 @@ onMounted(() => {
     height: 100%;
     background: #04112A;
 
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 70px;
+      /*margin-bottom: 10px;*/
+      /*margin-top: 10px;*/
+
+      img {
+        width: 50px; /* 设置图片宽度 */
+        height: auto; /* 高度自适应，保持宽高比 */
+        object-fit: contain; /* 保持图片宽高比填充容器 */
+      }
+    }
+    .separator {
+      width: 100%;
+      height: 3.5px;
+      background: #ffffff;
+      margin-bottom: 10px;
+    }
     .mb-2 {
       width: 100%;
       height: 70px;
@@ -477,4 +500,5 @@ onMounted(() => {
     justify-content: center;
   }
 }
+
 </style>

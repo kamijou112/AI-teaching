@@ -26,10 +26,10 @@ public class AIQuestionServiceImpl implements AIQuestionService {
 
     public AIQuestionServiceImpl() {
         this.client = new OkHttpClient().newBuilder()
-                .connectTimeout(50, TimeUnit.SECONDS) // 设置连接超时时间
-                .readTimeout(50, TimeUnit.SECONDS) // 设置读取超时时间
-                .writeTimeout(50, TimeUnit.SECONDS) // 设置写入超时时间
-                .build();;
+                .connectTimeout(50, TimeUnit.SECONDS)
+                .readTimeout(50, TimeUnit.SECONDS)
+                .writeTimeout(50, TimeUnit.SECONDS)
+                .build();
         this.gson = new Gson();
     }
 
@@ -69,14 +69,14 @@ public class AIQuestionServiceImpl implements AIQuestionService {
         JsonArray messagesArray = new JsonArray();
         JsonObject messageObject = new JsonObject();
         messageObject.addProperty("role", "user");
-        messageObject.addProperty("content", "请根据以下要求生成题目："
+        messageObject.addProperty("content", "请根据以下要求生成题目（题目类型为填空题、单项选择题、判断题）："
                 + requirements
                 + "以这个格式回答["
                 + "{"
-                + "\"type\": \"number\", // Type of the question (1 for fill-in-the-blank, 2 for multiple-choice, 3 for true/false)"
-                + "\"tigan\": \"string\", // Question content"
-                + "\"xuanxiang\": \"string\", // Options for multiple-choice questions, separated by '|', 如果不是选择题，这个就等于\"\""
-                + "\"daan\": \"string\" // 如果type=1，那么答案等于填空题答案；如果type=2，那么答案等于\"1\"或者\"2\"或者\"3\"或者\"4\"，分别对应选项A、B、C、D；如果type=3，答案等于1或者2，分别对应对、错。"
+                + "\"type\": \"number\", // 题目的类型，为1或者2或者3(1对应填空题, 2对应单项选择题, 3对应判断题)"
+                + "\"tigan\": \"string\", // 只有题目的题干保存在这，也就是问题部分"
+                + "\"xuanxiang\": \"string\", // 单项选择题的所有选项保存在这,各个选项之间用'|'隔开, 如果不是单项选择题，这个就等于\"\""
+                + "\"daan\": \"string\" // 这一项为题目的答案，必须要有值，如果type=1，即填空题，那么答案等于填空题答案；如果type=2，即单项选择题，那么答案转换为\"1\"或者\"2\"或者\"3\"或者\"4\"，必须是且只能是其中一个，分别对应着选项A、B、C、D；如果type=3，即判断题，答案转换为1或者2，且必须为其中一个，分别对应对、错。"
                 + "}] // 后面的内容不需要输出，这句话也不要”"
                 + "角色设定为“你是一个出题助手”");
         messagesArray.add(messageObject);

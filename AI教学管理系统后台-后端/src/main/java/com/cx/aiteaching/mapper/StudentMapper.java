@@ -1,12 +1,9 @@
 package com.cx.aiteaching.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cx.aiteaching.entity.Course;
 import com.cx.aiteaching.entity.Student;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
 
 /**
  * @author 汪洋
@@ -15,8 +12,7 @@ import java.util.List;
  */
 @Mapper
 public interface StudentMapper extends BaseMapper<Student> {
+    @Select("SELECT studyresult FROM ai_students WHERE id = #{id}")
+    String getStudyResultById(Integer id);
 
-
-    @Select(" SELECT studyresult FROM ai_students WHERE  username = #{usernmae} ")
-    String getStudyResultByUsername(String username);
 }
